@@ -1,2 +1,2 @@
-# gmain
+# Gmail Notifier
 Desktop Gmail Notifier
