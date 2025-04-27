@@ -111,7 +111,9 @@ void CheckUnreadEmails(const char* access_token, BOOL retry)
 					fetch_email_metadata(access_token, msg_id);
 				}
 			}
+
 			cJSON_Delete(json);
+			last_check = (ULONG)time(NULL);
 		}
 		else
 		{
@@ -128,13 +130,11 @@ void CheckUnreadEmails(const char* access_token, BOOL retry)
 			CheckUnreadEmails(access_token, TRUE);
 		}
 
+		free(chunk.memory);
 		curl_slist_free_all(headers);
 		curl_easy_cleanup(curl);
 	}
-
-	last_check = (ULONG)time(NULL);
-
-	free(chunk.memory);
+	
 	curl_global_cleanup();
 }
 

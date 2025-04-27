@@ -124,17 +124,21 @@ BOOL FetchTokens(const char* auth_code)
 	long response_code;
 	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 
-	if (res == CURLE_OK && response_code == 200)
+	if (res == CURLE_OK)
 	{
-		cJSON* json = cJSON_Parse(chunk.memory);
+		if (response_code == 200)
+		{
+			cJSON* json = cJSON_Parse(chunk.memory);
 
-		const char* access_token = cJSON_GetObjectItem(json, "access_token")->valuestring;
-		const char* refresh_token = cJSON_GetObjectItem(json, "refresh_token")->valuestring;
+			const char* access_token = cJSON_GetObjectItem(json, "access_token")->valuestring;
+			const char* refresh_token = cJSON_GetObjectItem(json, "refresh_token")->valuestring;
 
-		SaveToken(ACCESS_TOKEN_KEY, access_token);
-		SaveToken(REFRESH_TOKEN_KEY, refresh_token);
+			SaveToken(ACCESS_TOKEN_KEY, access_token);
+			SaveToken(REFRESH_TOKEN_KEY, refresh_token);
 
-		cJSON_Delete(json);
+			cJSON_Delete(json);
+		}
+
 		curl_slist_free_all(headers);
 		curl_easy_cleanup(curl);
 		free(chunk.memory);
@@ -280,7 +284,7 @@ BOOL RefreshTokens()
 
 	struct MemoryStruct chunk = { 0 };
 	CURL* curl = curl_easy_init();
-	
+
 	if (!curl) return FALSE;
 
 	char post_fields[1024];
@@ -290,7 +294,7 @@ BOOL RefreshTokens()
 		"client_secret=%s&"
 		"grant_type=refresh_token",
 		refresh_token, CLIENT_ID, CLIENT_SECRET);
-	
+
 	free(refresh_token);
 
 	curl_easy_setopt(curl, CURLOPT_URL, "https://oauth2.googleapis.com/token");
@@ -309,15 +313,19 @@ BOOL RefreshTokens()
 	long response_code;
 	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 
-	if (res == CURLE_OK && response_code == 200)
+	if (res == CURLE_OK)
 	{
-		cJSON* json = cJSON_Parse(chunk.memory);
+		if (response_code == 200)
+		{
+			cJSON* json = cJSON_Parse(chunk.memory);
 
-		const char* access_token = cJSON_GetObjectItem(json, "access_token")->valuestring;
+			const char* access_token = cJSON_GetObjectItem(json, "access_token")->valuestring;
 
-		SaveToken(ACCESS_TOKEN_KEY, access_token);
+			SaveToken(ACCESS_TOKEN_KEY, access_token);
 
-		cJSON_Delete(json);
+			cJSON_Delete(json);
+		}
+		
 		curl_slist_free_all(headers);
 		curl_easy_cleanup(curl);
 		free(chunk.memory);
