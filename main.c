@@ -236,6 +236,7 @@ static Impl_IGeneric* pClassFactory = NULL;
 static IInspectable* pInspectable = NULL;
 static HSTRING hsXmlDocument = NULL;
 static HSTRING hsBanner = NULL;
+static WNDPROC g_OldPanelProc = NULL;
 
 static __x_ABI_CWindows_CUI_CNotifications_CIToastNotifier* pToastNotifier = NULL;
 static __x_ABI_CWindows_CUI_CNotifications_CIToastNotification* pToastNotification = NULL;
@@ -279,6 +280,36 @@ void Toast(wchar_t* msg_id, wchar_t* from, wchar_t* subject, wchar_t* snippet)
 	pToastNotifier->lpVtbl->Show(pToastNotifier, pToastNotification);
 }
 
+LRESULT CALLBACK PanelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+		case WM_COMMAND:
+		{
+			if (LOWORD(wParam) == ID_BUTTON)
+			{
+				if (!Auth())
+				{
+					MessageBoxA(hwnd, "Auth code was not received", "Auth failed", MB_OK | MB_ICONERROR);
+				}
+			}
+			if (LOWORD(wParam) == ID_BUTTON2)
+			{
+				char* token = GetAccessToken(NULL);
+
+				if (token)
+				{
+					CheckUnreadEmails(token, NULL);
+					free(token);
+				}
+			}
+		}
+		break;
+	}
+
+	return CallWindowProcW(g_OldPanelProc, hwnd, msg, wParam, lParam);
+}
+
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	static HWND hButton, hButton2, hPanel, hPanel2, hLabel;
@@ -304,6 +335,8 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 			hPanel2 = CreateWindowA("Button", "How to use", WS_CHILD | WS_VISIBLE | BS_GROUPBOX, 20, 20, 300, 100, hwnd, (HMENU)ID_PANEL2, NULL, NULL);
 			hButton = CreateWindowA("Button", "(Re-)Authenticate", WS_CHILD | WS_VISIBLE, 20, 30, 120, 30, hPanel, (HMENU)ID_BUTTON, NULL, NULL);
 			hButton2 = CreateWindowA("Button", "Check unread emails", WS_CHILD | WS_VISIBLE, 160, 30, 120, 30, hPanel, (HMENU)ID_BUTTON2, NULL, NULL);
+			
+			g_OldPanelProc = (WNDPROC)SetWindowLongPtrW(hPanel, GWLP_WNDPROC, (LONG_PTR)PanelProc);
 
 			HWND hChild1 = GetWindow(hwnd, GW_CHILD);
 
@@ -339,26 +372,6 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 			EndPaint(hwnd, &ps);
 		}
 		break;
-
-		case WM_COMMAND:
-			if (LOWORD(wParam) == ID_BUTTON)
-			{
-				if (!Auth())
-				{
-					MessageBoxA(hwnd, "Auth code was not received", "Auth failed", MB_OK | MB_ICONERROR);
-				}
-			}
-			if (LOWORD(wParam) == ID_BUTTON2)
-			{
-				char* token = GetAccessToken(NULL);
-
-				if (token)
-				{
-					CheckUnreadEmails(token, NULL);
-					free(token);
-				}
-			}
-			break;
 
 		case WM_DESTROY:
 			StopTimer(hwnd);
