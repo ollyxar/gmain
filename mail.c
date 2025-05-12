@@ -110,10 +110,11 @@ void CheckUnreadEmails(const char* access_token, BOOL retry)
 
 					fetch_email_metadata(access_token, msg_id);
 				}
+
+				last_check = (ULONG)time(NULL);
 			}
 
 			cJSON_Delete(json);
-			last_check = (ULONG)time(NULL);
 		}
 		else
 		{
@@ -124,9 +125,9 @@ void CheckUnreadEmails(const char* access_token, BOOL retry)
 
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 
-		if (response_code > 200 && retry == NULL && RefreshTokens())
+		if (response_code > 200 && retry == FALSE && RefreshTokens())
 		{
-			access_token = GetAccessToken(NULL);
+			access_token = GetAccessToken();
 			CheckUnreadEmails(access_token, TRUE);
 		}
 

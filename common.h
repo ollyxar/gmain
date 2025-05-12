@@ -18,7 +18,7 @@ void OpenBrowserForAuth();
 BOOL FetchTokens(const char* auth_code);
 void CheckUnreadEmails(const char* access_token, BOOL retry);
 BOOL RefreshTokens();
-char* GetAccessToken(BOOL retry);
+char* GetAccessToken();
 void Toast(wchar_t* msg_id, wchar_t* from, wchar_t* subject, wchar_t* snippet);
 BOOL MarkAsRead(const char* access_token, const char* msg_id);
 BOOL Trash(const char* access_token, const char* msg_id);

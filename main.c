@@ -117,7 +117,7 @@ static HRESULT __stdcall Impl_INotificationActivationCallback_Activate(INotifica
 
 	if (!_wcsicmp(action, L"read"))
 	{
-		char* token = GetAccessToken(NULL);
+		char* token = GetAccessToken();
 
 		if (token)
 		{
@@ -130,7 +130,7 @@ static HRESULT __stdcall Impl_INotificationActivationCallback_Activate(INotifica
 
 	if (!_wcsicmp(action, L"delete"))
 	{
-		char* token = GetAccessToken(NULL);
+		char* token = GetAccessToken();
 
 		if (token)
 		{
@@ -295,11 +295,11 @@ LRESULT CALLBACK PanelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			if (LOWORD(wParam) == ID_BUTTON2)
 			{
-				char* token = GetAccessToken(NULL);
+				char* token = GetAccessToken();
 
 				if (token)
 				{
-					CheckUnreadEmails(token, NULL);
+					CheckUnreadEmails(token, FALSE);
 					free(token);
 				}
 			}
@@ -382,11 +382,11 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 			if (wParam == TIMER_ID)
 			{
 				StopTimer(hwnd);
-				char* token = GetAccessToken(NULL);
+				char* token = GetAccessToken();
 
 				if (token)
 				{
-					CheckUnreadEmails(token, NULL);
+					CheckUnreadEmails(token, FALSE);
 					free(token);
 					StartTimer(hwnd);
 				}

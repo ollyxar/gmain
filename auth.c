@@ -143,7 +143,10 @@ BOOL FetchTokens(const char* auth_code)
 		curl_easy_cleanup(curl);
 		free(chunk.memory);
 
-		return TRUE;
+		if (response_code == 200)
+		{
+			return TRUE;
+		}
 	}
 
 	return FALSE;
@@ -330,22 +333,29 @@ BOOL RefreshTokens()
 		curl_easy_cleanup(curl);
 		free(chunk.memory);
 
-		return TRUE;
+		if (response_code == 200)
+		{
+			return TRUE;
+		}
+
+		if (response_code > 400)
+		{
+			int msgboxID = MessageBoxA(NULL, "Authenticate?", "Not authenticated", MB_ICONWARNING | MB_OKCANCEL);
+
+			switch (msgboxID)
+			{
+				case IDOK:
+					return Auth();
+				default:
+					break;
+			}
+		}
 	}
 
 	return FALSE;
 }
 
-char* GetAccessToken(BOOL retry)
+char* GetAccessToken()
 {
-	long length;
-	char* buffer = 0;
-	char* result = LoadToken(ACCESS_TOKEN_KEY);
-
-	if (result == NULL && retry == NULL && Auth())
-	{
-		return GetAccessToken(TRUE);
-	}
-
-	return result;
+	return LoadToken(ACCESS_TOKEN_KEY);
 }
