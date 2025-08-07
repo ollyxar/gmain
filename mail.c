@@ -150,7 +150,7 @@ BOOL MarkAsRead(const char* access_token, const char* msg_id)
 
 	struct curl_slist* headers = NULL;
 
-	char auth_header[256];
+	char auth_header[512];
 	snprintf(auth_header, sizeof(auth_header), "Authorization: Bearer %s", access_token);
 
 	headers = curl_slist_append(headers, "Content-Type: application/json");
@@ -183,7 +183,7 @@ BOOL Trash(const char* access_token, const char* msg_id)
 
 	struct curl_slist* headers = NULL;
 
-	char auth_header[256];
+	char auth_header[512];
 	snprintf(auth_header, sizeof(auth_header), "Authorization: Bearer %s", access_token);
 
 	headers = curl_slist_append(headers, "Content-Type: application/json");
