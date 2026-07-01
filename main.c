@@ -278,6 +278,12 @@ void Toast(wchar_t* msg_id, wchar_t* from, wchar_t* subject, wchar_t* snippet)
 	pXmlDocumentIO->lpVtbl->LoadXml(pXmlDocumentIO, hsBanner);
 	pNotificationFactory->lpVtbl->CreateToastNotification(pNotificationFactory, pXmlDocument, &pToastNotification);
 	pToastNotifier->lpVtbl->Show(pToastNotifier, pToastNotification);
+
+	if (pToastNotification) pToastNotification->lpVtbl->Release(pToastNotification);
+	if (pXmlDocumentIO) pXmlDocumentIO->lpVtbl->Release(pXmlDocumentIO);
+	if (pXmlDocument) pXmlDocument->lpVtbl->Release(pXmlDocument);
+	if (pInspectable) pInspectable->lpVtbl->Release(pInspectable);
+	if (hsBanner) WindowsDeleteString(hsBanner);
 }
 
 LRESULT CALLBACK PanelProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -503,11 +509,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		DispatchMessage(&msg);
 	}
 
-	if (pToastNotification) pToastNotification->lpVtbl->Release(pToastNotification);
-	if (pXmlDocumentIO) pXmlDocumentIO->lpVtbl->Release(pXmlDocumentIO);
-	if (pXmlDocument) pXmlDocument->lpVtbl->Release(pXmlDocument);
-	if (pInspectable) pInspectable->lpVtbl->Release(pInspectable);
-	if (hsBanner) WindowsDeleteString(hsBanner);
 	if (hsXmlDocument) WindowsDeleteString(hsXmlDocument);
 	if (pNotificationFactory) pNotificationFactory->lpVtbl->Release(pNotificationFactory);
 	if (hsToastNotification) WindowsDeleteString(hsToastNotification);
